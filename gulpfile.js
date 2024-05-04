@@ -69,7 +69,7 @@ const ejsCompile = () => {
     .pipe(rename({ extname: '.html' }))
     .pipe(
       htmlMin({
-        removeComments: true,
+        removeComments: false,
         collapseWhitespace: true,
         collapseInlineTagWhitespace: true,
         preserveLineBreaks: true,
@@ -275,25 +275,15 @@ const watchFiles = () => {
   watch(paths.styles.copy, series(cssCopy));
   watch(paths.scripts.src, series(jsCompile, browserReloadFunc));
   watch(paths.scripts.copy, series(jsCopy, browserReloadFunc));
-  watch(
-    paths.images.src,
-    series(imagesCompress, webpConvert, browserReloadFunc)
-  );
+  watch(paths.images.src, series(imagesCompress, webpConvert, browserReloadFunc));
 };
 
 exports.default = series(
-  parallel(
-    ejsCompile,
-    sassCompile,
-    cssCopy,
-    jsCompile,
-    jsCopy,
-    imagesCompress,
-    webpConvert
-  ),
+  parallel(ejsCompile, sassCompile, cssCopy, jsCompile, jsCopy, imagesCompress, webpConvert),
   parallel(watchFiles, browserSyncFunc)
 );
 
+// その他のコマンド 例： npx gulp cleanAll の形で入力
 exports.cleanAll = series(cleanAll);
 exports.cleanExcludeHtml = series(cleanHtml);
 exports.cleanCssJs = series(cleanCssJs);
